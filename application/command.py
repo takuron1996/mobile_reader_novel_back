@@ -24,3 +24,5 @@ if __name__ == "__main__":
         asyncio.run(load_json.run(args))
     elif args[1] == "create_signature":
         create_signature.run()
+    else:
+        print(f"不明なコマンド: {args[1]}", file=sys.stderr)
