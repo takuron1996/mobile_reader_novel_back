@@ -5,8 +5,9 @@ from apis.signature import create_signature
 
 def run():
     """指定されたAPIエンドポイントに対するHTTPメソッドの組み合わせに基づいて、署名を生成して表示します。.
+
     この関数は、予め定義されたHTTPメソッドとAPIエンドポイントのタプル（api_tuple）をループで処理します。
-    各組み合わせに対して、`create_signature`関数を呼び出し、生成された署名を表示します。
+    各組み合わせに対して、`create_signature`関数を呼び出し、生成された署名を表示します。.
     """
     api_tuple = (
         ("GET", "http://localhost:8000/api/novelinfo"),
