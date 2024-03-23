@@ -27,7 +27,7 @@ async def main_text(
     ncode: str,
     episode: int,
     async_session: AsyncSession = Depends(get_async_session),
-    Signature: str = Header(),
+    signature: str = Header(alias = "Signature"),
 ):
     """小説取得APIのエンドポイント."""
     return await get_main_text(ncode, episode, async_session)
@@ -43,7 +43,7 @@ async def main_text(
 async def novel_info(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    Signature: str = Header(),
+    signature: str = Header(alias = "Signature"),
 ):
     """小説情報取得APIのエンドポイント."""
     return await get_novel_info(db, ncode)
@@ -59,7 +59,7 @@ async def novel_info(
 async def post_follow_router(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    Signature: str = Header(),
+    signature: str = Header(alias = "Signature"),
 ):
     """お気に入り登録APIのエンドポイント."""
     return await post_follow(db, ncode)
@@ -75,7 +75,7 @@ async def post_follow_router(
 async def delete_follow_router(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    Signature: str = Header(),
+    signature: str = Header(alias = "Signature"),
 ):
     """お気に入り削除APIのエンドポイント."""
     return await delete_follow(db, ncode)
@@ -92,7 +92,7 @@ async def delete_follow_router(
 async def auth_token_router(
     auth_data: AuthUserModel,
     async_session: AsyncSession = Depends(get_async_session),
-    Signature: str = Header(),
+    signature: str = Header(alias = "Signature"),
 ):
     """ログイン認証・トークン生成APIのエンドポイント."""
     match auth_data.grant_type:
