@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from config.environment import postgres_settings, settings
+from middleware import SignatureMiddleware
 
 
 def setup_middlewares(app: FastAPI) -> None:
@@ -19,6 +20,7 @@ def setup_middlewares(app: FastAPI) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(SignatureMiddleware)
 
 
 class SessionFactory:
