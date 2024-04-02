@@ -102,7 +102,7 @@ async def auth_token_router(
     """ログイン認証・トークン生成APIのエンドポイント."""
     match auth_data.grant_type:
         case GrantType.PASSWORD.value:
-            if None in {auth_data.user_id, auth_data.password}:
+            if None in {auth_data.id, auth_data.password}:
                 raise HTTPException(
                     status_code=400,
                     detail={
@@ -111,7 +111,7 @@ async def auth_token_router(
                     },
                 )
             return await auth_password(
-                email=auth_data.user_id,
+                email=auth_data.id,
                 password=auth_data.password,
                 db=db,
             )
