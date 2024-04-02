@@ -12,10 +12,10 @@ class Follow(Base):
     __table_args__ = (UniqueConstraint("book_id", "user_id"),)
 
     book_id = Column(
-        Integer, ForeignKey("book.id"), nullable=False, unique=True
+        Integer, ForeignKey("book.id"), nullable=False
     )
     user_id = Column(
-        Integer, ForeignKey("user.id"), nullable=False, unique=True
+        Integer, ForeignKey("user.id"), nullable=False
     )
 
     # Relationshipの定義

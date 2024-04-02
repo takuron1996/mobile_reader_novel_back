@@ -12,13 +12,13 @@ class ReadHistory(Base):
     __table_args__ = (UniqueConstraint("book_id", "user_id"),)
 
     book_id = Column(
-        Integer, ForeignKey("book.id"), nullable=False, unique=True
+        Integer, ForeignKey("book.id"), nullable=False
     )
     read_episode: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, comment="既読した話数"
     )
     user_id = Column(
-        Integer, ForeignKey("user.id"), nullable=False, unique=True
+        Integer, ForeignKey("user.id"), nullable=False
     )
 
     # Relationshipの定義
