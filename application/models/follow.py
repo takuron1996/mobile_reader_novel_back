@@ -11,12 +11,8 @@ class Follow(Base):
     __tablename__ = "follow"
     __table_args__ = (UniqueConstraint("book_id", "user_id"),)
 
-    book_id = Column(
-        Integer, ForeignKey("book.id"), nullable=False
-    )
-    user_id = Column(
-        Integer, ForeignKey("user.id"), nullable=False
-    )
+    book_id = Column(Integer, ForeignKey("book.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     # Relationshipの定義
     book = relationship("Book", back_populates="follow", uselist=False)
