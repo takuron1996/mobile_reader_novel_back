@@ -64,6 +64,14 @@ async def get_main_text(
     headers = ua_manager.get_random_user_headers()
 
     novel_response = request_get(novel_url, headers, payload)
+    if novel_response is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "server_error",
+                "error_description": "本文取得を失敗しました。",
+            },
+        )
     soup = BeautifulSoup(novel_response.text, "html.parser")
 
     novel_subtitle = soup.select_one("p.novel_subtitle")
