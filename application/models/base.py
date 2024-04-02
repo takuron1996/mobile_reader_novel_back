@@ -28,7 +28,9 @@ class PasswordMixin:
         """パスワードをハッシュ化して設定."""
         pwd_bytes = password.encode("utf-8")
         salt = bcrypt.gensalt()
-        self._password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+        self._password = bcrypt.hashpw(password=pwd_bytes, salt=salt).decode(
+            "utf8"
+        )
 
     def check_password(self, password):
         """設定したパスワードと一致するかどうかを検証."""

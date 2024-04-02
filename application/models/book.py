@@ -1,5 +1,6 @@
 """このモジュールでは、小説情報を表現するためのデータベースモデルを提供します."""
 
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,7 +16,8 @@ class Book(Base):
         String(255), nullable=False, unique=True, comment="小説コード"
     )
 
-    # ReadHistoryとのone-to-oneの関係を定義
+    # Relationshipの定義
     read_history = relationship(
-        "ReadHistory", back_populates="book", uselist=False
+        "ReadHistory", back_populates="book", uselist=True
     )
+    follow = relationship("Follow", back_populates="book", uselist=True)
