@@ -1,21 +1,56 @@
 """このモジュールは、トークン認証の機能を提供します."""
+from datetime import datetime, timedelta
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.environment import jwt_settings
-from crud import get_user
-from domain.user.token import create_token
+from crud import get_email_user, get_id_user
 from models.user import User
 from schemas.user import AuthUserResponse
 
 
+async def create_token(db: AsyncSession, user_id: str) -> AuthUserResponse:
+    """アクセストークン及びリフレッシュトークンを生成する関数.
+
+    Parameters:
+    - auth_data (AuthUserModel): 認証するためのユーザー情報。
+
+    Returns:
+    - AuthUserResponse: アクセストークン及びリフレッシュトークン。
+    """
+    minutes = timedelta(minutes=jwt_settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    month = timedelta(days=jwt_settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(ZoneInfo("Asia/Tokyo")) + minutes
+    refresh_expire = datetime.now(ZoneInfo("Asia/Tokyo")) + month
+    access_token = jwt.encode(
+        {"sub": user_id, "exp": expire},
+        jwt_settings.JWT_SECRET_ACCESS_KEY,
+        algorithm=jwt_settings.JWT_ALGORITHM,
+    )
+    refresh_token = jwt.encode(
+        {"sub": user_id, "exp": refresh_expire},
+        jwt_settings.JWT_SECRET_REFRESH_KEY,
+        algorithm=jwt_settings.JWT_ALGORITHM,
+    )
+
+    user = await get_id_user(db, int(user_id))
+    user.set_refresh_token(refresh_token)
+    db.add(user)
+    await db.commit()
+
+    return AuthUserResponse(
+        access_token=access_token, refresh_token=refresh_token
+    )
+
+
 async def auth_password(
+    db: AsyncSession,
     email: str,
     password: str,
-    async_session: AsyncSession,
 ) -> AuthUserResponse:
     """id/passwordによる認証を行う関数.
 
@@ -32,7 +67,7 @@ async def auth_password(
             return False
         return user.check_password(password)
 
-    user = await get_user(async_session, email)
+    user = await get_email_user(db, email)
 
     if not authenticate_user(user):
         raise HTTPException(
@@ -43,10 +78,10 @@ async def auth_password(
             },
         )
 
-    return await create_token(user.id)
+    return await create_token(db, str(user.id))
 
 
-async def auth_token(refresh_token: str) -> AuthUserResponse:
+async def auth_token(db: AsyncSession, refresh_token: str) -> AuthUserResponse:
     """リフレッシュトークンによる認証を行う関数.
 
     Parameters:
@@ -62,6 +97,15 @@ async def auth_token(refresh_token: str) -> AuthUserResponse:
             algorithms=jwt_settings.JWT_ALGORITHM,
         )
         user_id = payload.get("sub")
+        user = await get_id_user(db, int(user_id))
+        if not user.check_refresh_token(refresh_token):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "error": "invalid_token",
+                    "error_description": "不正なリフレッシュトークンです",
+                },
+            )
         if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -79,4 +123,4 @@ async def auth_token(refresh_token: str) -> AuthUserResponse:
             },
         )
 
-    return await create_token(str(user_id))
+    return await create_token(db, user_id)
