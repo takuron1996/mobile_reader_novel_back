@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apis.permmisions import check_access_token
 from config.config import get_async_session
 from domain.narou.follow import delete_follow, post_follow
 from domain.narou.main_text import get_main_text
@@ -27,10 +28,11 @@ async def main_text(
     ncode: str,
     episode: int,
     async_session: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias = "Signature"),
+    signature: str = Header(alias="Signature"),
+    user_id: int = Depends(check_access_token),
 ):
     """小説取得APIのエンドポイント."""
-    return await get_main_text(ncode, episode, async_session)
+    return await get_main_text(ncode, episode, user_id, async_session)
 
 
 @router.get(
@@ -43,10 +45,11 @@ async def main_text(
 async def novel_info(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias = "Signature"),
+    signature: str = Header(alias="Signature"),
+    user_id: int = Depends(check_access_token),
 ):
     """小説情報取得APIのエンドポイント."""
-    return await get_novel_info(db, ncode)
+    return await get_novel_info(db, ncode, user_id)
 
 
 @router.post(
@@ -59,10 +62,11 @@ async def novel_info(
 async def post_follow_router(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias = "Signature"),
+    signature: str = Header(alias="Signature"),
+    user_id: int = Depends(check_access_token),
 ):
     """お気に入り登録APIのエンドポイント."""
-    return await post_follow(db, ncode)
+    return await post_follow(db, ncode, user_id)
 
 
 @router.delete(
@@ -75,14 +79,15 @@ async def post_follow_router(
 async def delete_follow_router(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias = "Signature"),
+    signature: str = Header(alias="Signature"),
+    user_id: int = Depends(check_access_token),
 ):
     """お気に入り削除APIのエンドポイント."""
-    return await delete_follow(db, ncode)
+    return await delete_follow(db, ncode, user_id)
 
 
 @router.post(
-    "/token/",
+    "/api/token",
     response_model=AuthUserResponse,
     status_code=status.HTTP_200_OK,
     summary="ログイン認証・トークン生成API",
@@ -91,19 +96,37 @@ async def delete_follow_router(
 )
 async def auth_token_router(
     auth_data: AuthUserModel,
-    async_session: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias = "Signature"),
+    db: AsyncSession = Depends(get_async_session),
+    signature: str = Header(alias="Signature"),
 ):
     """ログイン認証・トークン生成APIのエンドポイント."""
     match auth_data.grant_type:
         case GrantType.PASSWORD.value:
+            if None in {auth_data.user_id, auth_data.password}:
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "error": "parameter_error",
+                        "error_description": "user_id と password は必須となります。",
+                    },
+                )
             return await auth_password(
                 email=auth_data.user_id,
                 password=auth_data.password,
-                async_session=async_session,
+                db=db,
             )
         case GrantType.REFRESH_TOKEN.value:
-            return await auth_token(refresh_token=auth_data.refresh_token)
+            if auth_data.refresh_token is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "error": "parameter_error",
+                        "error_description": "refresh_token は必須となります。",
+                    },
+                )
+            return await auth_token(
+                db=db, refresh_token=auth_data.refresh_token
+            )
         case _:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
