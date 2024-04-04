@@ -34,8 +34,6 @@ class User(Base, PasswordMixin):
     def check_refresh_token(self, refresh_token):
         """設定したリフレッシュトークンと一致するかどうかを検証."""
         input_refresh_token_hash = refresh_token.encode("utf-8")
-        print(input_refresh_token_hash)
-        print(self._refresh_token)
         if self._refresh_token is None:
             return True
         hashed_refresh_token = self._refresh_token.encode("utf-8")
