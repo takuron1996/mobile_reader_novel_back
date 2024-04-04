@@ -33,9 +33,9 @@ class User(Base, PasswordMixin):
 
     def check_refresh_token(self, refresh_token):
         """設定したリフレッシュトークンと一致するかどうかを検証."""
-        input_refresh_token_hash = refresh_token.encode("utf-8")
         if self._refresh_token is None:
             return True
+        input_refresh_token_hash = refresh_token.encode("utf-8")
         hashed_refresh_token = self._refresh_token.encode("utf-8")
         return bcrypt.checkpw(input_refresh_token_hash, hashed_refresh_token)
 
