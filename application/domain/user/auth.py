@@ -14,14 +14,7 @@ from schemas.user import AuthUserResponse
 
 
 async def create_token(db: AsyncSession, user_id: str) -> AuthUserResponse:
-    """アクセストークン及びリフレッシュトークンを生成する関数.
-
-    Parameters:
-    - auth_data (AuthUserModel): 認証するためのユーザー情報。
-
-    Returns:
-    - AuthUserResponse: アクセストークン及びリフレッシュトークン。
-    """
+    """アクセストークン及びリフレッシュトークンを生成する関数."""
     minutes = timedelta(minutes=jwt_settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     month = timedelta(days=jwt_settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
     expire = datetime.now(ZoneInfo("Asia/Tokyo")) + minutes
@@ -52,15 +45,7 @@ async def auth_password(
     email: str,
     password: str,
 ) -> AuthUserResponse:
-    """id/passwordによる認証を行う関数.
-
-    Parameters:
-    - auth_data (AuthUserModel): 認証するためユーザー情報。
-    - async_session (AsyncSession): DBとのセッション。
-
-    Returns:
-    - create_tokenのレスポンス
-    """
+    """id/passwordによる認証を行う関数."""
 
     def authenticate_user(user: Optional[User]):
         if user is None:
@@ -82,14 +67,7 @@ async def auth_password(
 
 
 async def auth_token(db: AsyncSession, refresh_token: str) -> AuthUserResponse:
-    """リフレッシュトークンによる認証を行う関数.
-
-    Parameters:
-    - auth_data (AuthUserModel): 認証するためのユーザー情報。
-
-    Returns:
-    - AuthUserResponse: アクセストークン及びリフレッシュトークン。
-    """
+    """リフレッシュトークンによる認証を行う関数."""
     try:
         payload = jwt.decode(
             refresh_token,
