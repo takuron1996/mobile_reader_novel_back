@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.environment import jwt_settings
-from crud import get_email_user, get_id_user
+from crud import get_email_user, get_user_by_id
 from models.user import User
 from schemas.user import AuthUserResponse
 
@@ -37,7 +37,7 @@ async def create_token(db: AsyncSession, user_id: str) -> AuthUserResponse:
         algorithm=jwt_settings.JWT_ALGORITHM,
     )
 
-    user = await get_id_user(db, int(user_id))
+    user = await get_user_by_id(db, int(user_id))
     user.set_refresh_token(refresh_token)
     db.add(user)
     await db.commit()
@@ -97,7 +97,7 @@ async def auth_token(db: AsyncSession, refresh_token: str) -> AuthUserResponse:
             algorithms=jwt_settings.JWT_ALGORITHM,
         )
         user_id = payload.get("sub")
-        user = await get_id_user(db, int(user_id))
+        user = await get_user_by_id(db, int(user_id))
         if not user.check_refresh_token(refresh_token):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

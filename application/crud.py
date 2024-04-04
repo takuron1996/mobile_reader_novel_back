@@ -120,7 +120,7 @@ async def get_email_user(db: AsyncSession, email: str) -> User:
     return user
 
 
-async def get_id_user(db: AsyncSession, id: int) -> User:
+async def get_user_by_id(db: AsyncSession, id: int) -> User:
     """指定されたメールアドレスに紐づくユーザー情報を返す関数."""
     result = await db.execute(
         select(User).where(User.id == id),
