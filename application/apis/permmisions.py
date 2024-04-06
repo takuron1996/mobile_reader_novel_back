@@ -2,10 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
+from apis.exception import ErrorHttpException
 from config.environment import jwt_settings
 
 bearer_security = HTTPBearer()
@@ -27,10 +28,8 @@ def check_access_token(
         user_id = payload.get("sub")
         return int(user_id)
     except JWTError:
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={
-                "error": "invalid_token",
-                "error_description": "トークンの認証エラー。",
-            },
+            error="invalid_token",
+            error_description="トークンの認証エラー。",
         )

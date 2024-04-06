@@ -1,8 +1,9 @@
 """ルーター用モジュール."""
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apis.exception import ErrorHttpException
 from apis.permmisions import check_access_token
 from config.config import get_async_session
 from domain.narou.follow import delete_follow, post_follow
@@ -103,12 +104,10 @@ async def auth_token_router(
     match auth_data.grant_type:
         case GrantType.PASSWORD.value:
             if None in {auth_data.id, auth_data.password}:
-                raise HTTPException(
-                    status_code=400,
-                    detail={
-                        "error": "parameter_error",
-                        "error_description": "user_id と password は必須となります。",
-                    },
+                raise ErrorHttpException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    error="invalid_parameter",
+                    error_description="user_id と password は必須となります。",
                 )
             return await auth_password(
                 email=auth_data.id,
@@ -117,21 +116,17 @@ async def auth_token_router(
             )
         case GrantType.REFRESH_TOKEN.value:
             if auth_data.refresh_token is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail={
-                        "error": "parameter_error",
-                        "error_description": "refresh_token は必須となります。",
-                    },
+                raise ErrorHttpException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    error="invalid_parameter",
+                    error_description="refresh_token は必須となります。",
                 )
             return await auth_token(
                 db=db, refresh_token=auth_data.refresh_token
             )
         case _:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "error": "invalid_grant_type",
-                    "error_description": "grant_typeが不明です",
-                },
+            raise ErrorHttpException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                error="invalid_parameter",
+                error_description="grant_typeが不明です。",
             )

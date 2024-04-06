@@ -1,8 +1,9 @@
 """小説取得API."""
 from bs4 import BeautifulSoup
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apis.exception import ErrorHttpException
 from apis.request import request_get
 from apis.urls import Url
 from apis.user_agent import UserAgentManager
@@ -40,18 +41,20 @@ async def get_main_text(
     novel_data = json_data.novel_data
 
     if novel_data is None:
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nコードか話数が存在しません",
+            error="invalid_parameter",
+            error_description="Nコードか話数が存在しません。",
         )
 
     # 不正なnコードかどうかのチェック・存在しないエピソードかどうかのチェック
     # all_count(検索ヒット数)とlimit数が一致していない場合はエラーを返す
     # フロントから渡された話数と全話数が一致していない場合はエラーを返す
     if not all_count == 1 or episode > novel_data.general_all_no:
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nコードか話数が存在しません",
+            error="invalid_parameter",
+            error_description="Nコードか話数が存在しません。",
         )
 
     next_episode = not episode == novel_data.general_all_no
@@ -65,23 +68,19 @@ async def get_main_text(
 
     novel_response = request_get(novel_url, headers, payload)
     if novel_response is None:
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": "server_error",
-                "error_description": "本文取得を失敗しました。",
-            },
+            error="server_error",
+            error_description="本文取得を失敗しました。",
         )
     soup = BeautifulSoup(novel_response.text, "html.parser")
 
     novel_subtitle = soup.select_one("p.novel_subtitle")
     if novel_subtitle is None:
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "error": "server_error",
-                "error_description": "本文取得を失敗しました。",
-            },
+            error="server_error",
+            error_description="本文取得を失敗しました。",
         )
     sub_title = novel_subtitle.text
 
