@@ -109,7 +109,7 @@ async def check_follow_exists_by_book_id(
     return True
 
 
-async def get_email_user(db: AsyncSession, email: str) -> User:
+async def get_user_by_email(db: AsyncSession, email: str) -> User:
     """指定されたメールアドレスに紐づくユーザー情報を返す関数."""
     result = await db.execute(
         select(User).where(User.email == email),

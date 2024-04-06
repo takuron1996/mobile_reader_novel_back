@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.environment import jwt_settings
-from crud import get_email_user, get_user_by_id
+from crud import get_user_by_email, get_user_by_id
 from models.user import User
 from schemas.user import AuthUserResponse
 
@@ -51,7 +51,7 @@ async def auth_password(
             return False
         return user.check_password(password)
 
-    user = await get_email_user(db, email)
+    user = await get_user_by_email(db, email)
 
     if not authenticate_user(user):
         raise HTTPException(
