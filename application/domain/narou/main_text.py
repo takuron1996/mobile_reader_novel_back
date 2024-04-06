@@ -15,6 +15,7 @@ from schemas.novel import NovelResponse
 async def get_main_text(
     ncode: str,
     episode: int,
+    user_id: int,
     db: AsyncSession = Depends(get_async_session),
 ) -> dict:
     """指定されたncode(小説コード)とepisode(話数)の小説本文をスクレイピングで取得する関数.
@@ -63,9 +64,26 @@ async def get_main_text(
     headers = ua_manager.get_random_user_headers()
 
     novel_response = request_get(novel_url, headers, payload)
+    if novel_response is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "server_error",
+                "error_description": "本文取得を失敗しました。",
+            },
+        )
     soup = BeautifulSoup(novel_response.text, "html.parser")
 
-    sub_title = soup.select_one("p.novel_subtitle").text
+    novel_subtitle = soup.select_one("p.novel_subtitle")
+    if novel_subtitle is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "server_error",
+                "error_description": "本文取得を失敗しました。",
+            },
+        )
+    sub_title = novel_subtitle.text
 
     honbun = soup.select_one("#novel_honbun").text
     honbun += "\n"
@@ -74,7 +92,7 @@ async def get_main_text(
     # 非同期データベースクエリを実行してbook_idを取得
     book_id = await ensure_book_exists(db, ncode)
     # 指定されたbook_idに対応する既読情報を更新
-    await update_or_create_read_history(db, book_id, episode)
+    await update_or_create_read_history(db, user_id, book_id, episode)
 
     novel = NovelResponse(
         title=novel_data.title,

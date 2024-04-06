@@ -19,20 +19,23 @@ class GrantType(str, Enum):
 class AuthUserModel(BaseModel):
     """トークンAPIで使用するバリデーションモデル."""
 
-    user_id: str | None = Field(
-        ...,
+    id: str | None = Field(
         title="メールアドレス",
         description="ユーザー自身が設定したメールアドレス",
         example="test01@example.com",
+        default=None,
     )
     password: str | None = Field(
-        ..., title="パスワード", description="パスワード", example="pass"
+        title="パスワード",
+        description="パスワード",
+        example="pass",
+        default=None,
     )
     refresh_token: str | None = Field(
-        ...,
         title="リフレッシュトークン",
         description="リフレッシュトークン",
         example="sdhjjhjhsasfak",
+        default=None,
     )
     grant_type: str = Field(
         ..., title="認証方式", description="認証方式", example="password"

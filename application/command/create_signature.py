@@ -17,4 +17,4 @@ def run():
         ("POST", "http://localhost:8000/api/token"),
     )
     for method, url in api_tuple:
-        print(url, create_signature(method, url))
+        print(method, url, create_signature(method, url))

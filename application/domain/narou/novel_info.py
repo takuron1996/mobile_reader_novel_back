@@ -86,7 +86,7 @@ def scrape_narou_chapters(ncode: str, total_episodes: int) -> list:
     return chapters
 
 
-async def get_novel_info(db: AsyncSession, ncode: str):
+async def get_novel_info(db: AsyncSession, ncode: str, user_id: int):
     """指定されたncodeに基づいて小説の情報を取得し、それをレスポンスモデルに設定する関数.
 
     Parameters:
@@ -108,9 +108,11 @@ async def get_novel_info(db: AsyncSession, ncode: str):
     # Bookテーブルからncodeに対応するbook_idを取得。
     book_id = await ensure_book_exists(db, ncode)
     # 非同期データベースクエリを実行してread_episodeを取得
-    read_episode = await get_latest_read_episode_by_book_id(db, book_id)
+    read_episode = await get_latest_read_episode_by_book_id(
+        db, book_id, user_id
+    )
     # 非同期データベースクエリを実行してis_followを取得
-    is_follow = await check_follow_exists_by_book_id(db, book_id)
+    is_follow = await check_follow_exists_by_book_id(db, book_id, user_id)
     # 指定されたncodeの小説の目次情報をスクレイピングで取得
     chapters = scrape_narou_chapters(ncode, data.novel_data.general_all_no)
 
