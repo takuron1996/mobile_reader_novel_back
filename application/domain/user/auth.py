@@ -1,7 +1,6 @@
 """このモジュールは、トークン認証の機能を提供します."""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
-from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
@@ -17,8 +16,8 @@ async def create_token(db: AsyncSession, user_id: str) -> AuthUserResponse:
     """アクセストークン及びリフレッシュトークンを生成する関数."""
     minutes = timedelta(minutes=jwt_settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     days = timedelta(days=jwt_settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
-    expire = datetime.now(ZoneInfo("Asia/Tokyo")) + minutes
-    refresh_expire = datetime.now(ZoneInfo("Asia/Tokyo")) + days
+    expire = datetime.now(timezone.utc) + minutes
+    refresh_expire = datetime.now(timezone.utc) + days
     access_token = jwt.encode(
         {"sub": user_id, "exp": expire},
         jwt_settings.JWT_SECRET_ACCESS_KEY,
