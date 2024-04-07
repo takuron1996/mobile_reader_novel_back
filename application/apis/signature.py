@@ -5,7 +5,28 @@ import hmac
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from fastapi import Header, Request, status
+
+from apis.exception import ErrorHttpException
 from config.environment import settings
+
+
+async def verify_signature(
+    request: Request, signature: str = Header(alias="Signature")
+):
+    """署名を検証."""
+    url = request.url
+    if not hmac.compare_digest(
+        signature,
+        create_signature(
+            request.method, f"{url.scheme}://{url.netloc}{url.path}"
+        ),
+    ):
+        raise ErrorHttpException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            error="invalid_signature",
+            error_description="署名が間違っています。",
+        )
 
 
 def create_signature(

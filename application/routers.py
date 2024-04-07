@@ -1,10 +1,11 @@
 """ルーター用モジュール."""
 
-from fastapi import APIRouter, Depends, Header, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apis.exception import ErrorHttpException
 from apis.permmisions import check_access_token
+from apis.signature import verify_signature
 from config.config import get_async_session
 from domain.narou.follow import delete_follow, post_follow
 from domain.narou.main_text import get_main_text
@@ -29,7 +30,7 @@ async def main_text(
     ncode: str,
     episode: int,
     async_session: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias="Signature"),
+    signature=Depends(verify_signature),
     user_id: int = Depends(check_access_token),
 ):
     """小説取得APIのエンドポイント."""
@@ -46,7 +47,7 @@ async def main_text(
 async def novel_info(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias="Signature"),
+    signature=Depends(verify_signature),
     user_id: int = Depends(check_access_token),
 ):
     """小説情報取得APIのエンドポイント."""
@@ -63,7 +64,7 @@ async def novel_info(
 async def post_follow_router(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias="Signature"),
+    signature=Depends(verify_signature),
     user_id: int = Depends(check_access_token),
 ):
     """お気に入り登録APIのエンドポイント."""
@@ -80,7 +81,7 @@ async def post_follow_router(
 async def delete_follow_router(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias="Signature"),
+    signature=Depends(verify_signature),
     user_id: int = Depends(check_access_token),
 ):
     """お気に入り削除APIのエンドポイント."""
@@ -98,7 +99,7 @@ async def delete_follow_router(
 async def auth_token_router(
     auth_data: AuthUserModel,
     db: AsyncSession = Depends(get_async_session),
-    signature: str = Header(alias="Signature"),
+    signature=Depends(verify_signature),
 ):
     """ログイン認証・トークン生成APIのエンドポイント."""
     match auth_data.grant_type:
