@@ -2,10 +2,11 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import HTTPException, status
+from fastapi import status
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apis.exception import ErrorHttpException
 from config.environment import jwt_settings
 from crud import get_user_by_email, get_user_by_id
 from models.user import User
@@ -54,12 +55,10 @@ async def auth_password(
     user = await get_user_by_email(db, email)
 
     if not authenticate_user(user):
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "error": "bad_request",
-                "error_description": "メールアドレスかpasswordが異なります",
-            },
+            error="invalid_parameter",
+            error_description="メールアドレスかpasswordが異なります。",
         )
 
     return await create_token(db, str(user.id))
@@ -76,28 +75,22 @@ async def auth_token(db: AsyncSession, refresh_token: str) -> AuthUserResponse:
         user_id = payload.get("sub")
         user = await get_user_by_id(db, int(user_id))
         if not user.check_refresh_token(refresh_token):
-            raise HTTPException(
+            raise ErrorHttpException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail={
-                    "error": "invalid_token",
-                    "error_description": "不正なリフレッシュトークンです",
-                },
+                error="invalid_token",
+                error_description="不正なリフレッシュトークンです。",
             )
         if user_id is None:
-            raise HTTPException(
+            raise ErrorHttpException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail={
-                    "error": "unknown_user",
-                    "error_description": "不明なユーザーです",
-                },
+                error="invalid_token",
+                error_description="不明なユーザーです。",
             )
     except JWTError:
-        raise HTTPException(
+        raise ErrorHttpException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={
-                "error": "invalid_token",
-                "error_description": "アクセストークンの有効期限切れです。",
-            },
+            error="invalid_token",
+            error_description="アクセストークンの有効期限切れです。",
         )
 
     return await create_token(db, user_id)

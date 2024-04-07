@@ -1,8 +1,9 @@
 """このモジュールは、小説家になろうのAPIおよびウェブサイトから小説情報を取得し、整形して返すための機能を提供します."""
 from bs4 import BeautifulSoup
-from fastapi import HTTPException, status
+from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apis.exception import ErrorHttpException
 from apis.request import request_get
 from apis.urls import Url
 from apis.user_agent import UserAgentManager
@@ -49,9 +50,10 @@ def scrape_narou_chapters(ncode: str, total_episodes: int) -> list:
             Url.NOVEL_URL.value, headers=headers, payload=payload
         )
         if resp is None:
-            raise HTTPException(
+            raise ErrorHttpException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="ページが存在しません",
+                error="invalid_parameter",
+                error_description="ページが存在しません。",
             )
 
         soup = BeautifulSoup(resp.content, "html.parser")
