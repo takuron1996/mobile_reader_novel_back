@@ -2,6 +2,16 @@
 from pydantic import BaseModel, Field
 
 
+class FollowModel(BaseModel):
+    """フォローで使用するバリデーションモデル."""
+
+    ncode: str = Field(
+        title="ncode",
+        description="フォロー機能で使用したいncode",
+        example="n9690ip",
+    )
+
+
 class FollowResponse(BaseModel):
     """お気に入り処理の成功状態を示すレスポンスモデル.
 

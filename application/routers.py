@@ -11,7 +11,7 @@ from domain.narou.follow import delete_follow, post_follow
 from domain.narou.main_text import get_main_text
 from domain.narou.novel_info import get_novel_info
 from domain.user.auth import auth_password, auth_token
-from schemas.follow import FollowResponse
+from schemas.follow import FollowModel, FollowResponse
 from schemas.novel import NovelInfoResponse, NovelResponse
 from schemas.user import AuthUserModel, AuthUserResponse, GrantType
 
@@ -62,13 +62,13 @@ async def novel_info(
     tags=["お気に入り"],
 )
 async def post_follow_router(
-    ncode: str,
+    follow_model: FollowModel,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
     user_id: int = Depends(check_access_token),
 ):
     """お気に入り登録APIのエンドポイント."""
-    return await post_follow(db, ncode, user_id)
+    return await post_follow(db, follow_model.ncode, user_id)
 
 
 @router.delete(
@@ -79,13 +79,13 @@ async def post_follow_router(
     tags=["お気に入り"],
 )
 async def delete_follow_router(
-    ncode: str,
+    follow_model: FollowModel,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
     user_id: int = Depends(check_access_token),
 ):
     """お気に入り削除APIのエンドポイント."""
-    return await delete_follow(db, ncode, user_id)
+    return await delete_follow(db, follow_model.ncode, user_id)
 
 
 @router.post(
