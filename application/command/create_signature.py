@@ -15,6 +15,7 @@ def run():
         ("POST", "http://localhost:8000/api/follow"),
         ("DELETE", "http://localhost:8000/api/follow"),
         ("POST", "http://localhost:8000/api/token"),
+        ("POST", "http://localhost:8000/api/user"),
     )
     for method, url in api_tuple:
         print(method, url, create_signature(method, url))
