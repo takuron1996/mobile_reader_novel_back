@@ -11,9 +11,11 @@ from domain.narou.follow import delete_follow, post_follow
 from domain.narou.main_text import get_main_text
 from domain.narou.novel_info import get_novel_info
 from domain.user.auth import auth_password, auth_token
+from domain.user.resistration import user_resistration
 from schemas.follow import FollowModel, FollowResponse
 from schemas.novel import NovelInfoResponse, NovelResponse
-from schemas.user import AuthUserModel, AuthUserResponse, GrantType
+from schemas.token import AuthUserModel, AuthUserResponse, GrantType
+from schemas.user import UserRegistrationModel, UserRegistrationResponse
 
 router = APIRouter()
 
@@ -131,3 +133,21 @@ async def auth_token_router(
                 error="invalid_parameter",
                 error_description="grant_typeが不明です。",
             )
+
+
+@router.post(
+    "/api/user",
+    response_model=UserRegistrationResponse,
+    status_code=status.HTTP_200_OK,
+    summary="ユーザー登録API",
+    description="ユーザー登録を実施。",
+    tags=["user"],
+)
+async def user_resistration_router(
+    user_data: UserRegistrationModel,
+    db: AsyncSession = Depends(get_async_session),
+    signature=Depends(verify_signature),
+):
+    """ユーザー登録APIのエンドポイント."""
+    is_success = await user_resistration(db, user_data)
+    return UserRegistrationResponse(is_success=is_success)

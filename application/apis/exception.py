@@ -1,6 +1,7 @@
 """カスタムエラークラス用のモジュール."""
 
 from fastapi import HTTPException
+from pydantic_core import PydanticCustomError
 
 
 class ErrorHttpException(HTTPException):
@@ -10,3 +11,8 @@ class ErrorHttpException(HTTPException):
         """初期化."""
         detail = {"error": error, "error_description": error_description}
         super().__init__(status_code=status_code, detail=detail)
+
+
+def get_validation_exception(msg: str) -> PydanticCustomError:
+    """バリデーション発生時のエラーを取得."""
+    return PydanticCustomError("validation_error", msg)

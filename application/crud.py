@@ -129,3 +129,11 @@ async def get_user_by_id(db: AsyncSession, id: int) -> User:
     user: User = result.scalar_one_or_none()
 
     return user
+
+
+async def add_user(db: AsyncSession, email: str, password: str) -> None:
+    """新しいユーザーをデータベースに追加する関数."""
+    new_user = User(email=email)
+    new_user.set_password(password)
+    db.add(new_user)
+    await db.commit()

@@ -10,7 +10,7 @@ from apis.exception import ErrorHttpException
 from config.environment import jwt_settings
 from crud import get_user_by_email, get_user_by_id
 from models.user import User
-from schemas.user import AuthUserResponse
+from schemas.token import AuthUserResponse
 
 
 async def create_token(db: AsyncSession, user_id: str) -> AuthUserResponse:
