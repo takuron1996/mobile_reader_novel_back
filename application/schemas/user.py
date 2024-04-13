@@ -18,3 +18,14 @@ class UserRegistrationModel(BaseModel):
         description="パスワード",
         example="Password1",
     )
+
+
+class UserRegistrationResponse(BaseModel):
+    """ユーザー登録APIのレスポンスモデル."""
+
+    is_success: bool = Field(..., title="ユーザー登録が成功してるかどうか")
+
+    class Config:
+        """Pydanticモデルの設定クラス."""
+
+        json_schema_extra = {"example": {"is_success": True}}
