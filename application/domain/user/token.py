@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from jose import jwt
 
 from config.environment import jwt_settings
-from schemas.user import AuthUserResponse
+from schemas.token import AuthUserResponse
 
 
 async def create_token(user_id: str) -> AuthUserResponse:
