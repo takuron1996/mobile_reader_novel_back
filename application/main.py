@@ -22,9 +22,9 @@ async def error_validation_exception_handler(
     request: Request, exc: RequestValidationError
 ):
     """バリデーションエラーのメッセージを整形するハンドラー."""
-    _, msg = exc.errors()[0].get("msg").split(", ")
-    print(msg)
-    detail = {"error": "validation_error", "error_description": msg}
+    error = exc.errors()[0]
+    detail = {"error": error.get("type"), "error_description": error.get("msg")}
+    print(detail)
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=detail,
