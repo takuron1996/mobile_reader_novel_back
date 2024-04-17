@@ -33,7 +33,7 @@ async def main_text(
     episode: int,
     async_session: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """小説取得APIのエンドポイント."""
     return await get_main_text(ncode, episode, user_id, async_session)
@@ -50,7 +50,7 @@ async def novel_info(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """小説情報取得APIのエンドポイント."""
     return await get_novel_info(db, ncode, user_id)
@@ -67,7 +67,7 @@ async def post_follow_router(
     follow_model: FollowModel,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """お気に入り登録APIのエンドポイント."""
     return await post_follow(db, follow_model.ncode, user_id)
@@ -84,7 +84,7 @@ async def delete_follow_router(
     follow_model: FollowModel,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """お気に入り削除APIのエンドポイント."""
     return await delete_follow(db, follow_model.ncode, user_id)

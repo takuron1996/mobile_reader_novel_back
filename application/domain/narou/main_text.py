@@ -16,7 +16,7 @@ from schemas.novel import NovelResponse
 async def get_main_text(
     ncode: str,
     episode: int,
-    user_id: int,
+    user_id: str,
     db: AsyncSession = Depends(get_async_session),
 ) -> dict:
     """指定されたncode(小説コード)とepisode(話数)の小説本文をスクレイピングで取得する関数.

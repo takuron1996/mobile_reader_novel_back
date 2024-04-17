@@ -20,5 +20,5 @@ async def user_resistration(
             error="validation_error",
             error_description="指定されたemailは使用することはできません",
         )
-    add_user(db, email, user_data.password)
+    await add_user(db, email, user_data.password)
     return True
