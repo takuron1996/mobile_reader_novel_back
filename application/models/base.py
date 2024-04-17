@@ -5,6 +5,7 @@
 これにより、他のデータベースモデルクラスはこの基底クラスを継承して、
 非同期操作を含むデータベースの操作が可能になります。
 """
+import ulid
 import bcrypt
 from sqlalchemy import String
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -14,8 +15,11 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 class Base(AsyncAttrs, DeclarativeBase):
     """宣言的マッピングの基底クラス."""
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, comment="ID"
+    id: Mapped[str] = mapped_column(
+        String(26),
+        primary_key=True,
+        default=lambda: ulid.new().str,
+        comment="ID",
     )
 
 

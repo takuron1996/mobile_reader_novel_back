@@ -10,9 +10,6 @@ from models.base import Base, PasswordMixin
 class User(Base, PasswordMixin):
     """ユーザーテーブルのORM."""
 
-    from models.follow import Follow
-    from models.read_history import ReadHistory
-
     __tablename__ = "user"
 
     email: Mapped[str] = mapped_column(
