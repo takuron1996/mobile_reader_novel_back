@@ -13,7 +13,7 @@ from crud import (
 from schemas.follow import FollowResponse
 
 
-async def post_follow(db: AsyncSession, ncode: str, user_id: int):
+async def post_follow(db: AsyncSession, ncode: str, user_id: str):
     """指定されたncodeに基づいて小説の情報を取得し、それをお気に入りに設定する関数."""
     # Bookテーブルからncodeに対応するbook_idを取得。
     book_id = await ensure_book_exists(db, ncode)
@@ -23,7 +23,7 @@ async def post_follow(db: AsyncSession, ncode: str, user_id: int):
     return FollowResponse(is_success=is_follow)
 
 
-async def delete_follow(db: AsyncSession, ncode: str, user_id: int):
+async def delete_follow(db: AsyncSession, ncode: str, user_id: str):
     """指定されたncodeに基づいて小説の情報を取得し、それをお気に入りから削除する関数."""
     # Bookテーブルからncodeに対応するbook_idを取得
     book_id = await ensure_book_exists(db, ncode)

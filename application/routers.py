@@ -11,7 +11,7 @@ from domain.narou.follow import delete_follow, post_follow
 from domain.narou.main_text import get_main_text
 from domain.narou.novel_info import get_novel_info
 from domain.user.auth import auth_password, auth_token
-from domain.user.resistration import user_resistration
+from domain.user.user_registration import user_registration
 from schemas.follow import FollowModel, FollowResponse
 from schemas.novel import NovelInfoResponse, NovelResponse
 from schemas.token import AuthUserModel, AuthUserResponse, GrantType
@@ -33,7 +33,7 @@ async def main_text(
     episode: int,
     async_session: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """小説取得APIのエンドポイント."""
     return await get_main_text(ncode, episode, user_id, async_session)
@@ -50,7 +50,7 @@ async def novel_info(
     ncode: str,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """小説情報取得APIのエンドポイント."""
     return await get_novel_info(db, ncode, user_id)
@@ -67,7 +67,7 @@ async def post_follow_router(
     follow_model: FollowModel,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """お気に入り登録APIのエンドポイント."""
     return await post_follow(db, follow_model.ncode, user_id)
@@ -84,7 +84,7 @@ async def delete_follow_router(
     follow_model: FollowModel,
     db: AsyncSession = Depends(get_async_session),
     signature=Depends(verify_signature),
-    user_id: int = Depends(check_access_token),
+    user_id: str = Depends(check_access_token),
 ):
     """お気に入り削除APIのエンドポイント."""
     return await delete_follow(db, follow_model.ncode, user_id)
@@ -149,5 +149,5 @@ async def user_resistration_router(
     signature=Depends(verify_signature),
 ):
     """ユーザー登録APIのエンドポイント."""
-    is_success = await user_resistration(db, user_data)
+    is_success = await user_registration(db, user_data)
     return UserRegistrationResponse(is_success=is_success)

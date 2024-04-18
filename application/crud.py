@@ -34,7 +34,7 @@ async def ensure_book_exists(db: AsyncSession, ncode: str) -> int:
 
 
 async def create_or_check_existing_follow(
-    db: AsyncSession, book_id: int, user_id: int
+    db: AsyncSession, book_id: str, user_id: str
 ) -> bool:
     """指定されたbook_idに基づいてFollowテーブルを検索し、存在しない場合は新しく作成する.
 
@@ -52,7 +52,7 @@ async def create_or_check_existing_follow(
 
 
 async def delete_follow_by_book_id(
-    db: AsyncSession, book_id: int, user_id: int
+    db: AsyncSession, book_id: str, user_id: str
 ) -> bool:
     """指定されたbook_idに基づいてFollowテーブルからエントリを削除する."""
     query_delete_follow = delete(Follow).where(
@@ -65,7 +65,7 @@ async def delete_follow_by_book_id(
 
 
 async def update_or_create_read_history(
-    db: AsyncSession, user_id: int, book_id: int, episode: int
+    db: AsyncSession, user_id: str, book_id: str, episode: int
 ):
     """指定されたbook_idに対応する既読情報を更新する。既読情報が存在しない場合は新たに挿入する."""
     stmt = insert(ReadHistory).values(
@@ -81,7 +81,7 @@ async def update_or_create_read_history(
 
 
 async def get_latest_read_episode_by_book_id(
-    db: AsyncSession, book_id: int, user_id: int
+    db: AsyncSession, book_id: str, user_id: str
 ) -> int:
     """指定されたbook_idに対応する既読エピソード数を非同期で取得する関数."""
     query = select(ReadHistory.read_episode).filter(
@@ -96,7 +96,7 @@ async def get_latest_read_episode_by_book_id(
 
 
 async def check_follow_exists_by_book_id(
-    db: AsyncSession, book_id: int, user_id: int
+    db: AsyncSession, book_id: str, user_id: str
 ) -> bool:
     """指定されたbook_idに紐づくFollowレコードの存在有無に基づいてフォローの有無を返す関数."""
     # Followテーブルからbook_idに紐づくレコードの存在チェック
@@ -120,7 +120,7 @@ async def get_user_by_email(db: AsyncSession, email: str) -> User:
     return user
 
 
-async def get_user_by_id(db: AsyncSession, id: int) -> User:
+async def get_user_by_id(db: AsyncSession, id: str) -> User:
     """指定されたメールアドレスに紐づくユーザー情報を返す関数."""
     result = await db.execute(
         select(User).where(User.id == id),

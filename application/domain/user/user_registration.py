@@ -8,7 +8,7 @@ from crud import add_user, get_user_by_email
 from schemas.user import UserRegistrationModel
 
 
-async def user_resistration(
+async def user_registration(
     db: AsyncSession, user_data: UserRegistrationModel
 ) -> bool:
     """ユーザー登録APIのロジック処理."""
@@ -20,5 +20,5 @@ async def user_resistration(
             error="validation_error",
             error_description="指定されたemailは使用することはできません",
         )
-    add_user(db, email, user_data.password)
+    await add_user(db, email, user_data.password)
     return True

@@ -3,7 +3,7 @@
         "model": "User",
         "file": "user",
         "fields": {
-            "id": 1,
+            "id": "01HVP6ESCATTHVVKDS4Z9W1BWE",
             "email": "test01@example.com",
             "password": "$2b$12$17MZrZ9yULres00LIMeeIOOtjKDH5l7hvzqGPosEdLPyFshK5CPOa"
         }

@@ -1,5 +1,5 @@
 """このモジュールは、ユーザーのお気に入り（フォロー）情報を表すためのデータベースモデルを提供します."""
-from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, UniqueConstraint, String
 from sqlalchemy.orm import relationship
 
 from models.base import Base
@@ -11,8 +11,8 @@ class Follow(Base):
     __tablename__ = "follow"
     __table_args__ = (UniqueConstraint("book_id", "user_id"),)
 
-    book_id = Column(Integer, ForeignKey("book.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    book_id = Column(String(26), ForeignKey("book.id"), nullable=False)
+    user_id = Column(String(26), ForeignKey("user.id"), nullable=False)
 
     # Relationshipの定義
     book = relationship("Book", back_populates="follow", uselist=False)

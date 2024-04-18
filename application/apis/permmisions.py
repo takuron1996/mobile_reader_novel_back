@@ -16,7 +16,7 @@ def check_access_token(
     credentials: Annotated[
         HTTPAuthorizationCredentials, Depends(bearer_security)
     ]
-) -> int:
+) -> str:
     """アクセストークンを取得してuser_idを返却."""
     access_token = credentials.credentials
     try:
@@ -26,7 +26,7 @@ def check_access_token(
             algorithms=jwt_settings.JWT_ALGORITHM,
         )
         user_id = payload.get("sub")
-        return int(user_id)
+        return user_id
     except JWTError:
         raise ErrorHttpException(
             status_code=status.HTTP_401_UNAUTHORIZED,
