@@ -11,7 +11,7 @@ from domain.narou.follow import delete_follow, post_follow
 from domain.narou.main_text import get_main_text
 from domain.narou.novel_info import get_novel_info
 from domain.user.auth import auth_password, auth_token
-from domain.user.resistration import user_resistration
+from application.domain.user.user_registration import user_registration
 from schemas.follow import FollowModel, FollowResponse
 from schemas.novel import NovelInfoResponse, NovelResponse
 from schemas.token import AuthUserModel, AuthUserResponse, GrantType
@@ -149,5 +149,5 @@ async def user_resistration_router(
     signature=Depends(verify_signature),
 ):
     """ユーザー登録APIのエンドポイント."""
-    is_success = await user_resistration(db, user_data)
+    is_success = await user_registration(db, user_data)
     return UserRegistrationResponse(is_success=is_success)

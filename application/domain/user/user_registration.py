@@ -8,7 +8,7 @@ from crud import add_user, get_user_by_email
 from schemas.user import UserRegistrationModel
 
 
-async def user_resistration(
+async def user_registration(
     db: AsyncSession, user_data: UserRegistrationModel
 ) -> bool:
     """ユーザー登録APIのロジック処理."""
