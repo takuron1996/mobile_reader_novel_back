@@ -1,5 +1,5 @@
 """このモジュールは、ユーザーのお気に入り（フォロー）情報を表すためのデータベースモデルを提供します."""
-from sqlalchemy import Column, ForeignKey, UniqueConstraint, String
+from sqlalchemy import Column, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from models.base import Base

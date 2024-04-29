@@ -1,5 +1,7 @@
 """ルーター用モジュール."""
 
+from typing import List
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,12 +9,12 @@ from apis.exception import ErrorHttpException
 from apis.permmisions import check_access_token
 from apis.signature import verify_signature
 from config.config import get_async_session
-from domain.narou.follow import delete_follow, post_follow
+from domain.narou.follow import delete_follow, get_follow, post_follow
 from domain.narou.main_text import get_main_text
 from domain.narou.novel_info import get_novel_info
 from domain.user.auth import auth_password, auth_token
 from domain.user.user_registration import user_registration
-from schemas.follow import FollowModel, FollowResponse
+from schemas.follow import FollowModel, FollowResponse, GetFollowResponse
 from schemas.novel import NovelInfoResponse, NovelResponse
 from schemas.token import AuthUserModel, AuthUserResponse, GrantType
 from schemas.user import UserRegistrationModel, UserRegistrationResponse
@@ -54,6 +56,22 @@ async def novel_info(
 ):
     """小説情報取得APIのエンドポイント."""
     return await get_novel_info(db, ncode, user_id)
+
+
+@router.get(
+    "/api/follow",
+    response_model=List[GetFollowResponse],
+    summary="お気に入り取得API",
+    description="ログインユーザーのお気に入り小説の情報を取得",
+    tags=["お気に入り"],
+)
+async def get_follow_router(
+    db: AsyncSession = Depends(get_async_session),
+    signature=Depends(verify_signature),
+    user_id: str = Depends(check_access_token),
+):
+    """お気に入り取得APIのエンドポイント."""
+    return await get_follow(db, user_id)
 
 
 @router.post(
