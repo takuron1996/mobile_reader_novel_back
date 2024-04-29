@@ -34,3 +34,29 @@ class FollowResponse(BaseModel):
         """
 
         json_schema_extra = {"example": {"is_success": True}}
+
+
+class GetFollowResponse(BaseModel):
+    """お気に入り取得APIのレスポンスモデル."""
+
+    ncode: str
+    title: str
+    author: str
+    read_episode: int
+
+    class Config:
+        """Pydanticモデルの設定クラス.
+
+        json_schema_extra: スキーマの例を定義します。
+                        この例はAPIのドキュメントで使用され、
+                        APIの使用方法を理解しやすくするために役立ちます。
+        """
+
+        json_schema_extra = {
+            "example": {
+                "ncode": "xxxx",
+                "title": "小説名",
+                "author": "作者名",
+                "read_episode": 10,
+            }
+        }
