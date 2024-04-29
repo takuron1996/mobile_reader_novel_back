@@ -12,6 +12,7 @@ def run():
     api_tuple = (
         ("GET", "http://localhost:8000/api/novelinfo"),
         ("GET", "http://localhost:8000/api/maintext"),
+        ("GET", "http://localhost:8000/api/follow"),
         ("POST", "http://localhost:8000/api/follow"),
         ("DELETE", "http://localhost:8000/api/follow"),
         ("POST", "http://localhost:8000/api/token"),
