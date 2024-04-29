@@ -1,5 +1,5 @@
 """このモジュールは、ユーザーの既読情報を表すためのデータベースモデルを提供します."""
-from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint, String
+from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
