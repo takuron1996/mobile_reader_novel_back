@@ -56,6 +56,13 @@ async def get_follow(db: AsyncSession, user_id: str):
     result = await db.execute(query)
     books = result.scalars().all()
 
+    # 既読情報をDBから取得
+    query = select(ReadHistory).filter(
+        ReadHistory.book_id.in_(ids), ReadHistory.user_id == user_id
+    )
+    result = await db.execute(query)
+    read_histories = set(result.scalars().all())
+
     # 小説家になろうから情報を取得
     headers = UserAgentManager().get_random_user_headers()
     result_response = []
@@ -72,15 +79,12 @@ async def get_follow(db: AsyncSession, user_id: str):
         soup = BeautifulSoup(response.text, "html.parser")
         title = soup.find(class_="novel_title").get_text()
         author = soup.find(class_="novel_writername").find("a").get_text()
-
-        # 既読情報を取得
-        query = select(ReadHistory.read_episode).filter(
-            ReadHistory.book_id == book.id, ReadHistory.user_id == user_id
+        read_history = tuple(
+            filter(lambda x: x.book_id == book.id, read_histories)
         )
-        result = await db.execute(query)
-        episode = result.scalar_one_or_none()
-        if episode is None:
-            episode = 1
+        episode = 1
+        if read_history:
+            episode = read_history[0].read_episode
 
         result_response.append(
             GetFollowResponse(
