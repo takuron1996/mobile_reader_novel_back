@@ -1,6 +1,8 @@
 """FastAPIのエントリーポイント."""
 
 
+import time
+
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
@@ -15,6 +17,20 @@ app = FastAPI()
 setup_middlewares(app)
 
 app.include_router(router)
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """HTTP通信の開始と終了をロギング."""
+    start_time = time.time()
+    print(f"接続開始: {request.method} {request.url}")
+
+    response = await call_next(request)
+
+    process_time = time.time() - start_time
+    print(f"接続終了: {process_time:.4f} secs")
+
+    return response
 
 
 @app.exception_handler(RequestValidationError)
